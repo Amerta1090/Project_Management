@@ -4,8 +4,6 @@
 #define maxproyek 150
 using namespace std;
 
-
-
 struct proyek{
 	string listproyek[maxproyek];
 	string statusproyek;	
@@ -38,6 +36,7 @@ void ListProyek();
 void ListProyekWIP();//untuk list proyek WIP
 void ListAntrianProyekAkun();//untuk list proyek antrian User/Akun
 void ListProyekFinish();//untuk list proyek finsih
+void GantiPassword();
 void Menu()
 {
 	int menu_pil;
@@ -58,12 +57,10 @@ void Menu()
 	}
 	else if(menu_pil == 2)
 	{
-// 		ListProyekWIP();
 		ListProyekWIP();
 	}
 	else if(menu_pil == 3)
 	{
-// 		ListProyekFinish();
 		ListProyekFinish();
 	}
 	else if(menu_pil == 4)
@@ -72,7 +69,7 @@ void Menu()
 	}
 	else if(menu_pil == 5)
 	{
-// 		GantiPassword();
+ 		GantiPassword();
 	}
 	else if(menu_pil == 6)
 	{
@@ -431,7 +428,30 @@ void ListAntrianProyekAkun()
 		Menu();
 	}
 }
+void GantiPassword()
+{
+    string password, pass_baru;
+    cout << "Masukkan Password : "; cin >> password;
+	for(int i = 0; i <= akuninfo.npenanda; i++)
+	{
+		if(password == akuninfo.password[i])
+		{
+        cout << "Password berhasil diverifikasi." << endl;
+		cout << "Masukkan Password Baru :";cin>>pass_baru;
+        akuninfo.password[i] = pass_baru;
+        cout << "Password berhasil diubah." << endl;
+        system("cls");
+        Menu();
+		break;
+		}
+        else
+        {
+        cout << "Password yang anda masukkan salah." << endl;
+        Menu();
+        }
 
+    }
+}
 int main()
 {
     data_ada();
