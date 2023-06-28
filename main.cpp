@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+#include <cstdio>
 #define maxproyek 150
 using namespace std;
 
@@ -37,6 +38,21 @@ void ListProyekWIP();//untuk list proyek WIP
 void ListAntrianProyekAkun();//untuk list proyek antrian User/Akun
 void ListProyekFinish();//untuk list proyek finsih
 void GantiPassword();
+
+void SearchProyek();
+void SortProyek();
+void UndoTambahProyek();
+void UndoPindahWIP();
+
+void SearchProyekWIP();
+void SortProyekWIP();
+void UndoPindahFinish();
+
+void SearchProyekFinish();
+void SortProyekFinish();
+
+
+
 void Menu()
 {
 	int menu_pil;
@@ -46,9 +62,8 @@ void Menu()
 	cout << "1. List Proyek" << endl;
 	cout << "2. List Proyek WIP" << endl;
 	cout << "3. List Proyek Finish" << endl;
-	cout << "4. List Antrian Proyek Akun" << endl;
-	cout << "5. Ganti Password Akun/User" << endl;
-	cout << "6. Logout" << endl;
+	cout << "4. Ganti Password Akun/User" << endl;
+	cout << "5. Logout" << endl;
 	cout << "Masukkan Pilihan [1..6] : ";
 	cin >> menu_pil;
 	if(menu_pil == 1)
@@ -65,13 +80,9 @@ void Menu()
 	}
 	else if(menu_pil == 4)
 	{
-		ListAntrianProyekAkun();
-	}
-	else if(menu_pil == 5)
-	{
  		GantiPassword();
 	}
-	else if(menu_pil == 6)
+	else if(menu_pil == 5)
 	{
 		Login();
 	}
@@ -100,7 +111,6 @@ void Login()
 			{
 				cout << "Selamat anda berhasil login!!" << endl;
 //				system("cls");
-                sleep(2);
 				Menu();
 				break;
 			}
@@ -158,6 +168,7 @@ void data_ada()
         // cout << proyek.penanda_array;
     }
 }
+
 void ListProyek()
 {
     int nomor = 1;
@@ -176,18 +187,16 @@ void ListProyek()
         cout << nomor << ". " << proyek.listproyek[i] << endl;
         nomor++;
     }
-    for(int i = 0; i < proyekwip.penanda_array; i++)
-    {
-        cout << "WIP" << ". " << proyekwip.listproyek[i] << endl;
-    }
     cout << "Pilih Opsi dibawah ini [1..4]" << endl;
-    cout << "[1]Tambah Proyek [2]Hapus Proyek [3]Pindahkan ke WIP [4]Tambahkan Data Sekaligus [5]Kembali : ";
+    cout << "[1]Tambah Proyek [2]Hapus Proyek [3]Pindahkan ke WIP\n[4] Search Proyek [5] Sort Proyek [6]Undo Tambah Proyek [7]Undo Pindah WIP [8]Kembali : ";
     cin >> pil_menu_lp;
     if(pil_menu_lp == 1)
     {
         // cout << proyek.penanda_array << endl;
-        cout << "Masukkan Proyek Yang diTambahkan : ";
-        cin >> proyek_tambah;
+        cout << "Masukkan Proyek Yang Ditambahkan : ";
+        cin.ignore();
+        getline(cin, proyek_tambah);
+
         proyek.listproyek[proyek.penanda_array] += proyek_tambah;
         proyek.penanda_array++;
         ListProyek();
@@ -241,47 +250,115 @@ void ListProyek()
         proyek.penanda_array--;
         ListProyek();
     }
+    else if(pil_menu_lp == 4)
+    {
+        SearchProyek();
+    }
     else if(pil_menu_lp == 5)
+    {
+        SortProyek();
+    }
+    else if(pil_menu_lp == 6)
+    {
+        UndoTambahProyek();
+    }
+    else if(pil_menu_lp == 7)
+    {
+        UndoPindahWIP();
+    }
+    else if(pil_menu_lp == 8)
     {
     	Menu();
     }
-    else if(pil_menu_lp == 4)
-    {
-    	cout << "Tambahkan Menu Sekaligus" << endl;
-    	cout << "Berapa banyak data yang ingin dimasukkan sekaligus? : ";
-    	cin >> jumlah_data;
-    	for(int i = 0; i < jumlah_data; i++)
-    	{
-    		cout << "Masukkan proyek : ";
-    		cin >> proyek_sementara;
-    		proyek.listproyeksementara[i] += proyek_sementara;
-		}
-		cout << "Berikut List Sementara" << endl;
-		int nomersementara = 1;
-		for(int i = 0; i < jumlah_data; i++)
-		{
-			cout << nomersementara << ". " << proyek.listproyeksementara[i] << endl;
-			nomersementara++;
-		}
-		string pilihan_yn;
-		cout << "Apakah Yakin ingin menambahkan ke list? (y/n) : ";
-		cin >> pilihan_yn;
-		if(pilihan_yn == "y")
-		{
-		for(int i = 0; i < jumlah_data; i++)
-		 {
-			proyek.listproyek[proyek.penanda_array] = proyek.listproyeksementara[i];
-			proyek.penanda_array++;
-		 }
-		 ListProyek();
-		}
-		else if(pilihan_yn == "n")
-		{
-			ListProyek();
-		}
-    	
-	}
 }
+void SearchProyek()
+{
+    string keyword;
+    cout << "Masukkan kata kunci: ";
+    cin.ignore();
+    getline(cin, keyword);
+
+    cout << "Hasil Pencarian Proyek:" << endl;
+    bool found = false;
+    for (int i = 0; i < proyek.penanda_array; i++)
+    {
+        if (proyek.listproyek[i].find(keyword) != string::npos)
+        {
+            cout << i + 1 << ". " << proyek.listproyek[i] << endl;
+            found = true;
+            getchar();
+            ListProyek();
+        }
+    }
+
+    if (!found)
+    {
+        cout << "Proyek tidak ditemukan." << endl;
+        getchar();
+        ListProyek();
+    }
+}
+void SortProyek()
+{
+    for (int i = 0; i < proyek.penanda_array - 1; i++)
+    {
+        for (int j = 0; j < proyek.penanda_array - i - 1; j++)
+        {
+            if (proyek.listproyek[j] > proyek.listproyek[j + 1])
+            {
+                string temp = proyek.listproyek[j];
+                proyek.listproyek[j] = proyek.listproyek[j + 1];
+                proyek.listproyek[j + 1] = temp;
+            }
+        }
+    }
+
+    // Menampilkan list proyek yang telah diurutkan
+    cout << "List Proyek setelah diurutkan:" << endl;
+    for (int i = 0; i < proyek.penanda_array; i++)
+    {
+        cout << i + 1 << ". " << proyek.listproyek[i] << endl;
+    }
+    getchar();
+    ListProyek();
+}
+void UndoTambahProyek()
+{
+    if (proyek.penanda_array > 0)
+    {
+        proyek.listproyek[proyek.penanda_array - 1] = "";
+        proyek.penanda_array--;
+        cout << "Proyek terakhir yang ditambahkan berhasil dihapus." << endl;
+    }
+    else
+    {
+        cout << "Tidak ada proyek yang dapat dihapus." << endl;
+    }
+    getchar();
+    ListProyek();
+}
+void UndoPindahWIP()
+{
+    if (proyekwip.penanda_array > 0)
+    {
+        int proyek_terakhir = proyekwip.penanda_array - 1;
+        proyek.listproyek[proyek.penanda_array] = proyekwip.listproyek[proyek_terakhir];
+        proyek.penanda_array++;
+        proyekwip.listproyek[proyek_terakhir] = "";
+        proyekwip.penanda_array--;
+
+        cout << "Proyek berhasil di-undo dan dikembalikan ke List Proyek." << endl;
+    }
+    else
+    {
+        cout << "Tidak ada proyek yang bisa di-undo pada List Proyek WIP." << endl;
+    }
+
+    getchar();
+    ListProyek();
+}
+
+
 void ListProyekWIP()
 {
 	int nomorwip = 1;
@@ -298,7 +375,7 @@ void ListProyekWIP()
         nomorwip++;
     }
     cout << "Pilih Opsi dibawah ini [1..3]" << endl;
-    cout << "[1]Hapus Proyek [2]Pindahkan ke Finish [3]Kembali : ";
+    cout << "[1]Hapus Proyek [2]Pindahkan ke Finish [4]Search Proyek WIP \n[5]Sort Proyek WIP [6]Undo Pindah Finish [7]Kembali : ";
     cin >> pil_menu_wip;
     if(pil_menu_wip == 1)
     {
@@ -348,11 +425,95 @@ void ListProyekWIP()
         proyekwip.penanda_array--;
         ListProyekWIP();
 	}
-	else if(pil_menu_wip == 3)
+    else if(pil_menu_wip == 4)
+    {
+        SearchProyekWIP();
+    }
+    else if(pil_menu_wip == 5)
+    {
+        SortProyekWIP();
+    }
+    else if(pil_menu_wip == 6)
+    {
+        UndoPindahFinish();
+    }
+	else if(pil_menu_wip == 7)
 	{
 		Menu();
 	}
 }
+void SearchProyekWIP()
+{
+    string keyword;
+    cout << "Masukkan kata kunci: ";
+    cin.ignore();
+    getline(cin, keyword);
+
+    cout << "Hasil Pencarian Proyek:" << endl;
+    bool found = false;
+    for (int i = 0; i < proyekwip.penanda_array; i++)
+    {
+        if (proyekwip.listproyek[i].find(keyword) != string::npos)
+        {
+            cout << i + 1 << ". " << proyekwip.listproyek[i] << endl;
+            found = true;
+            getchar();
+            ListProyekWIP();
+        }
+    }
+
+    if (!found)
+    {
+        cout << "Proyek tidak ditemukan." << endl;
+        getchar();
+        ListProyekWIP();
+    }
+}
+void SortProyekWIP()
+{
+     for (int i = 0; i < proyekwip.penanda_array - 1; i++)
+    {
+        for (int j = 0; j < proyekwip.penanda_array - i - 1; j++)
+        {
+            if (proyekwip.listproyek[j] > proyekwip.listproyek[j + 1])
+            {
+                string temp = proyekwip.listproyek[j];
+                proyekwip.listproyek[j] = proyekwip.listproyek[j + 1];
+                proyekwip.listproyek[j + 1] = temp;
+            }
+        }
+    }
+
+    // Menampilkan list proyek yang telah diurutkan
+    cout << "List Proyek setelah diurutkan:" << endl;
+    for (int i = 0; i < proyekwip.penanda_array; i++)
+    {
+        cout << i + 1 << ". " << proyekwip.listproyek[i] << endl;
+    }
+    getchar();
+    ListProyekWIP();
+}
+void UndoPindahFinish()
+{
+    if (proyekfinish.penanda_array > 0)
+    {
+        int proyek_terakhir = proyekfinish.penanda_array - 1;
+        proyekwip.listproyek[proyekwip.penanda_array] = proyekfinish.listproyek[proyek_terakhir];
+        proyekwip.penanda_array++;
+        proyekfinish.listproyek[proyek_terakhir] = "";
+        proyekfinish.penanda_array--;
+
+        cout << "Proyek berhasil di-undo dan dikembalikan ke List Proyek WIP." << endl;
+    }
+    else
+    {
+        cout << "Tidak ada proyek yang bisa di-undo pada List Proyek Finish." << endl;
+    }
+
+    getchar();
+    ListProyekWIP();
+}
+
 void ListProyekFinish()
 {
 	int nomorfinish = 1;
@@ -368,7 +529,7 @@ void ListProyekFinish()
         nomorfinish++;
     }
     cout << "Pilih Opsi dibawah ini [1..2]" << endl;
-    cout << "[1]Hapus Proyek [2]Kembali : ";
+    cout << "[1]Hapus Proyek [2]Search [3]Sort [4]Kembali : ";
     cin >> pil_menu_finish;
     if(pil_menu_finish == 1)
     {
@@ -393,11 +554,71 @@ void ListProyekFinish()
         proyekfinish.penanda_array--;
         ListProyekFinish();
 	}
-	else if(pil_menu_finish == 2)
+    else if(pil_menu_finish == 2)
+    {
+        SearchProyekFinish();
+    }
+    else if(pil_menu_finish == 3)
+    {
+        SortProyekFinish();
+    }
+	else if(pil_menu_finish == 4)
 	{
 		Menu();
 	}
 }
+void SearchProyekFinish()
+{
+    string keyword;
+    cout << "Masukkan kata kunci: ";
+    cin.ignore();
+    getline(cin, keyword);
+
+    cout << "Hasil Pencarian Proyek:" << endl;
+    bool found = false;
+    for (int i = 0; i < proyekfinish.penanda_array; i++)
+    {
+        if (proyekfinish.listproyek[i].find(keyword) != string::npos)
+        {
+            cout << i + 1 << ". " << proyekfinish.listproyek[i] << endl;
+            found = true;
+            getchar();
+            ListProyekFinish();
+        }
+    }
+
+    if (!found)
+    {
+        cout << "Proyek tidak ditemukan." << endl;
+        getchar();
+        ListProyekFinish();
+    }
+}
+void SortProyekFinish()
+{
+     for (int i = 0; i < proyekfinish.penanda_array - 1; i++)
+    {
+        for (int j = 0; j < proyekfinish.penanda_array - i - 1; j++)
+        {
+            if (proyekfinish.listproyek[j] > proyekfinish.listproyek[j + 1])
+            {
+                string temp = proyekfinish.listproyek[j];
+                proyekfinish.listproyek[j] = proyekfinish.listproyek[j + 1];
+                proyekfinish.listproyek[j + 1] = temp;
+            }
+        }
+    }
+
+    // Menampilkan list proyek yang telah diurutkan
+    cout << "List Proyek setelah diurutkan:" << endl;
+    for (int i = 0; i < proyekfinish.penanda_array; i++)
+    {
+        cout << i + 1 << ". " << proyekfinish.listproyek[i] << endl;
+    }
+    getchar();
+    ListProyekFinish();
+}
+
 void ListAntrianProyekAkun()
 {
 	int nomorantrian = 1;
@@ -429,6 +650,7 @@ void ListAntrianProyekAkun()
 	}
 }
 void GantiPassword()
+
 {
     string password, pass_baru;
     cout << "Masukkan Password : "; cin >> password;
@@ -452,10 +674,9 @@ void GantiPassword()
 
     }
 }
+
 int main()
 {
     data_ada();
 	Login();
 }
-
-//backend udah semua kecuali search, sort, stack(bingung)
