@@ -2,6 +2,8 @@
 #include <string>
 #include <unistd.h>
 #include <cstdio>
+#include <stack>
+#include <queue>
 #define maxproyek 150
 using namespace std;
 
@@ -10,6 +12,7 @@ struct proyek{
 	string statusproyek;	
 	int penanda_array = 0;
 	string listproyeksementara[maxproyek];
+    stack<string> undoStack;
 }proyek;
 struct proyekwip{
 	string listproyek[maxproyek];
@@ -28,9 +31,6 @@ struct akun{
 	int npenanda = 0;
 }akuninfo;
 
-struct Node{
-	
-};
 void Login(); //Menu Login
 void Menu(); //Untuk Menu Utama Pengguna
 void ListProyek();
@@ -188,7 +188,7 @@ void ListProyek()
         nomor++;
     }
     cout << "Pilih Opsi dibawah ini [1..4]" << endl;
-    cout << "[1]Tambah Proyek [2]Hapus Proyek [3]Pindahkan ke WIP\n[4] Search Proyek [5] Sort Proyek [6]Undo Tambah Proyek [7]Undo Pindah WIP [8]Kembali : ";
+    cout << "[1]Tambah Proyek\n[2]Hapus Proyek\n[3]Pindahkan ke WIP\n[4]Search Proyek\n[5]Sort Proyek\n[6]Undo Tambah Proyek\n[7]Undo Pindah WIP\n[8]Kembali: ";
     cin >> pil_menu_lp;
     if(pil_menu_lp == 1)
     {
@@ -199,6 +199,7 @@ void ListProyek()
 
         proyek.listproyek[proyek.penanda_array] += proyek_tambah;
         proyek.penanda_array++;
+        proyek.undoStack.push(proyek.listproyek[proyek.penanda_array - 1]); // push proyek terakhir ke stack
         ListProyek();
         
     }
@@ -341,11 +342,9 @@ void UndoPindahWIP()
 {
     if (proyekwip.penanda_array > 0)
     {
-        int proyek_terakhir = proyekwip.penanda_array - 1;
-        proyek.listproyek[proyek.penanda_array] = proyekwip.listproyek[proyek_terakhir];
-        proyek.penanda_array++;
-        proyekwip.listproyek[proyek_terakhir] = "";
-        proyekwip.penanda_array--;
+        proyek.listproyek[proyek.penanda_array - 1] = proyek.undoStack.top();
+        proyek.undoStack.pop(); // mengembalikan proyek terakhir dari stack
+        ListProyek();
 
         cout << "Proyek berhasil di-undo dan dikembalikan ke List Proyek." << endl;
     }
@@ -375,7 +374,7 @@ void ListProyekWIP()
         nomorwip++;
     }
     cout << "Pilih Opsi dibawah ini [1..3]" << endl;
-    cout << "[1]Hapus Proyek [2]Pindahkan ke Finish [4]Search Proyek WIP \n[5]Sort Proyek WIP [6]Undo Pindah Finish [7]Kembali : ";
+    cout << "[1]Hapus Proyek\n[2]Pindahkan ke Finish\n[4]Search Proyek WIP\n[5]Sort Proyek WIP\n[6]Undo Pindah Finish\n[7]Kembali\n: ";
     cin >> pil_menu_wip;
     if(pil_menu_wip == 1)
     {
@@ -529,7 +528,7 @@ void ListProyekFinish()
         nomorfinish++;
     }
     cout << "Pilih Opsi dibawah ini [1..2]" << endl;
-    cout << "[1]Hapus Proyek [2]Search [3]Sort [4]Kembali : ";
+    cout << "[1]Hapus Proyek\n[2]Search\n[3]Sort\n[4]Kembali : ";
     cin >> pil_menu_finish;
     if(pil_menu_finish == 1)
     {
