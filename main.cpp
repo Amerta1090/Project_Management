@@ -10,13 +10,23 @@ struct proyek{
 	string listproyek[maxproyek];
 	string statusproyek;	
 	int penanda_array = 0;
+	string listproyeksementara[maxproyek];
 }proyek;
-
+struct proyekwip{
+	string listproyek[maxproyek];
+	string statusproyek;
+	int penanda_array = 0;
+}proyekwip;
+struct proyekfinish{
+	string listproyek[maxproyek];
+	string statusproyek;
+	int penanda_array = 0;
+}proyekfinish;
 //Untuk tempat menyimpan data akun username dan password
 struct akun{
 	string username[99];//jono
 	string password[99];//123
-	int npenanda;
+	int npenanda = 0;
 }akuninfo;
 
 struct Node{
@@ -25,6 +35,9 @@ struct Node{
 void Login(); //Menu Login
 void Menu(); //Untuk Menu Utama Pengguna
 void ListProyek();
+void ListProyekWIP();//untuk list proyek WIP
+void ListAntrianProyekAkun();//untuk list proyek antrian User/Akun
+void ListProyekFinish();//untuk list proyek finsih
 void Menu()
 {
 	int menu_pil;
@@ -34,7 +47,7 @@ void Menu()
 	cout << "1. List Proyek" << endl;
 	cout << "2. List Proyek WIP" << endl;
 	cout << "3. List Proyek Finish" << endl;
-	cout << "4. Tambah Akun/User" << endl;
+	cout << "4. List Antrian Proyek Akun" << endl;
 	cout << "5. Ganti Password Akun/User" << endl;
 	cout << "6. Logout" << endl;
 	cout << "Masukkan Pilihan [1..6] : ";
@@ -46,14 +59,16 @@ void Menu()
 	else if(menu_pil == 2)
 	{
 // 		ListProyekWIP();
+		ListProyekWIP();
 	}
 	else if(menu_pil == 3)
 	{
 // 		ListProyekFinish();
+		ListProyekFinish();
 	}
 	else if(menu_pil == 4)
 	{
-		Login();
+		ListAntrianProyekAkun();
 	}
 	else if(menu_pil == 5)
 	{
@@ -82,20 +97,20 @@ void Login()
 		cin >> username;
 		cout << "Masukkan Password : ";
 		cin >> password;
-		for(int i = 0; i < 99; i++)
+		for(int i = 0; i <= akuninfo.npenanda; i++)
 		{
 			if(username == akuninfo.username[i] && password == akuninfo.password[i])
 			{
 				cout << "Selamat anda berhasil login!!" << endl;
 //				system("cls");
-                sleep(5);
+                sleep(2);
 				Menu();
 				break;
 			}
-			else if((i == 98 || i == 99) && username == akuninfo.username[i] && password == akuninfo.password[i])
+			else if(i == akuninfo.npenanda && (username != akuninfo.username[i] || password != akuninfo.password[i]))
 			{
 				cout << "Mohon masukkan username dan password yang benar" << endl;
-				sleep(3);
+				sleep(2);
 				// system("cls");
 				Login();
 				break;
@@ -116,14 +131,14 @@ void Login()
 			{
 			akuninfo.username[0] += user_baru;
 			akuninfo.password[0] += pass_baru;
-			akuninfo.npenanda = 0;
+			akuninfo.npenanda++;
 			cout << "Selamat akun telah terbuat!!" << endl;
 			Login(); 	
 			}
 			else
 			{
-			akuninfo.username[akuninfo.npenanda + 1] += user_baru;
-			akuninfo.password[akuninfo.npenanda + 1] += pass_baru; 
+			akuninfo.username[akuninfo.npenanda] += user_baru;
+			akuninfo.password[akuninfo.npenanda] += pass_baru; 
 			akuninfo.npenanda++;
 			cout << "Selamat akun telah terbuat!!" << endl;
 			Login();
@@ -152,27 +167,24 @@ void ListProyek()
     int count = 0;
     int pil_menu_lp;
     int proyek_hapus;
+    int proyek_WIP;
+    int jumlah_data;
+    string proyek_sementara;
     string proyek_tambah;
     system("cls");
     cout << "Tampilan List Proyek yang Ada" << endl;
     cout << "=============================" << endl << endl;
-    // Menghitung Value dalam Array
-    // for(int i = 0; i < maxproyek; i++)
-    // {
-    //     if(proyek.listproyek[i] == "")
-    //     {
-    //         break;
-    //     }
-    //     count++;
-    // }
-    // // End
     for(int i = 0; i < proyek.penanda_array; i++)
     {
         cout << nomor << ". " << proyek.listproyek[i] << endl;
         nomor++;
     }
+    for(int i = 0; i < proyekwip.penanda_array; i++)
+    {
+        cout << "WIP" << ". " << proyekwip.listproyek[i] << endl;
+    }
     cout << "Pilih Opsi dibawah ini [1..4]" << endl;
-    cout << "[1]Tambah Proyek [2]Hapus Proyek [3]Pindahkan ke WIP [4]Kembali : ";
+    cout << "[1]Tambah Proyek [2]Hapus Proyek [3]Pindahkan ke WIP [4]Tambahkan Data Sekaligus [5]Kembali : ";
     cin >> pil_menu_lp;
     if(pil_menu_lp == 1)
     {
@@ -209,15 +221,221 @@ void ListProyek()
     }
     else if(pil_menu_lp == 3)
     {
-    
+    	cout << "Pilih proyek yang akan dipindah ke WIP [1.." << proyek.penanda_array << "] : ";
+        cin >> proyek_WIP;
+        for(int i = 0; i < proyek.penanda_array; i++)
+        {
+         if(proyek_WIP-1 == i)
+         {
+         	 proyekwip.listproyek[proyekwip.penanda_array] = proyek.listproyek[i];
+             proyek.listproyek[i] = "";
+             break;
+         }
+        }
+        proyekwip.penanda_array++;
+        for(int i = 0; i < proyek.penanda_array; i++)
+        {
+            if(proyek.listproyek[i] == "")
+            {
+                proyek.listproyek[i] = proyek.listproyek[i+1];
+                proyek.listproyek[i+1] = "";
+            }
+        }
+        proyek.penanda_array--;
+        ListProyek();
+    }
+    else if(pil_menu_lp == 5)
+    {
+    	Menu();
     }
     else if(pil_menu_lp == 4)
     {
-    
-    }
+    	cout << "Tambahkan Menu Sekaligus" << endl;
+    	cout << "Berapa banyak data yang ingin dimasukkan sekaligus? : ";
+    	cin >> jumlah_data;
+    	for(int i = 0; i < jumlah_data; i++)
+    	{
+    		cout << "Masukkan proyek : ";
+    		cin >> proyek_sementara;
+    		proyek.listproyeksementara[i] += proyek_sementara;
+		}
+		cout << "Berikut List Sementara" << endl;
+		int nomersementara = 1;
+		for(int i = 0; i < jumlah_data; i++)
+		{
+			cout << nomersementara << ". " << proyek.listproyeksementara[i] << endl;
+			nomersementara++;
+		}
+		string pilihan_yn;
+		cout << "Apakah Yakin ingin menambahkan ke list? (y/n) : ";
+		cin >> pilihan_yn;
+		if(pilihan_yn == "y")
+		{
+		for(int i = 0; i < jumlah_data; i++)
+		 {
+			proyek.listproyek[proyek.penanda_array] = proyek.listproyeksementara[i];
+			proyek.penanda_array++;
+		 }
+		 ListProyek();
+		}
+		else if(pilihan_yn == "n")
+		{
+			ListProyek();
+		}
+    	
+	}
 }
+void ListProyekWIP()
+{
+	int nomorwip = 1;
+    int countwip = 0;
+    int pil_menu_wip;
+    int proyek_hapus_wip;
+    int proyek_pindah_finish;
+    system("cls");
+    cout << "Tampilan List Proyek WIP yang Ada" << endl;
+    cout << "=================================" << endl << endl;
+    for(int i = 0; i < proyekwip.penanda_array; i++)
+    {
+        cout << nomorwip << ". " << proyekwip.listproyek[i] << endl;
+        nomorwip++;
+    }
+    cout << "Pilih Opsi dibawah ini [1..3]" << endl;
+    cout << "[1]Hapus Proyek [2]Pindahkan ke Finish [3]Kembali : ";
+    cin >> pil_menu_wip;
+    if(pil_menu_wip == 1)
+    {
+    	cout << "Pilih proyek yang akan dihapus [1.." << proyekwip.penanda_array << "] : ";
+        cin >> proyek_hapus_wip;
+        for(int i = 0; i < proyekwip.penanda_array; i++)
+        {
+         if(proyek_hapus_wip-1 == i)
+         {
+             proyekwip.listproyek[i] = "";
+             break;
+         }
+        }
+        for(int i = 0; i < proyekwip.penanda_array; i++)
+        {
+            if(proyekwip.listproyek[i] == "")
+            {
+                proyekwip.listproyek[i] = proyekwip.listproyek[i+1];
+                proyekwip.listproyek[i+1] = "";
+            }
+        }
+        proyekwip.penanda_array--;
+        ListProyekWIP();
+	}
+	else if(pil_menu_wip == 2)
+	{
+		cout << "Pilih proyek yang akan dipindah ke Finish [1.." << proyekwip.penanda_array << "] : ";
+        cin >> proyek_pindah_finish;
+        for(int i = 0; i < proyekwip.penanda_array; i++)
+        {
+         if(proyek_pindah_finish-1 == i)
+         {
+         	 proyekfinish.listproyek[proyekfinish.penanda_array] = proyekwip.listproyek[i];
+             proyekwip.listproyek[i] = "";
+             break;
+         }
+        }
+        proyekfinish.penanda_array++;
+        for(int i = 0; i < proyekwip.penanda_array; i++)
+        {
+            if(proyekwip.listproyek[i] == "")
+            {
+                proyekwip.listproyek[i] = proyekwip.listproyek[i+1];
+                proyekwip.listproyek[i+1] = "";
+            }
+        }
+        proyekwip.penanda_array--;
+        ListProyekWIP();
+	}
+	else if(pil_menu_wip == 3)
+	{
+		Menu();
+	}
+}
+void ListProyekFinish()
+{
+	int nomorfinish = 1;
+    int countfinish = 0;
+    int pil_menu_finish;
+    int proyek_hapus_finish;
+    system("cls");
+    cout << "Tampilan List Proyek Finish yang Ada" << endl;
+    cout << "=================================" << endl << endl;
+    for(int i = 0; i < proyekfinish.penanda_array; i++)
+    {
+        cout << nomorfinish << ". " << proyekfinish.listproyek[i] << endl;
+        nomorfinish++;
+    }
+    cout << "Pilih Opsi dibawah ini [1..2]" << endl;
+    cout << "[1]Hapus Proyek [2]Kembali : ";
+    cin >> pil_menu_finish;
+    if(pil_menu_finish == 1)
+    {
+    	cout << "Pilih proyek yang akan dihapus [1.." << proyekfinish.penanda_array << "] : ";
+        cin >> proyek_hapus_finish;
+        for(int i = 0; i < proyekfinish.penanda_array; i++)
+        {
+         if(proyek_hapus_finish-1 == i)
+         {
+             proyekfinish.listproyek[i] = "";
+             break;
+         }
+        }
+        for(int i = 0; i < proyekfinish.penanda_array; i++)
+        {
+            if(proyekfinish.listproyek[i] == "")
+            {
+                proyekfinish.listproyek[i] = proyekfinish.listproyek[i+1];
+                proyekfinish.listproyek[i+1] = "";
+            }
+        }
+        proyekfinish.penanda_array--;
+        ListProyekFinish();
+	}
+	else if(pil_menu_finish == 2)
+	{
+		Menu();
+	}
+}
+void ListAntrianProyekAkun()
+{
+	int nomorantrian = 1;
+    int countantrian = 0;
+    int pil_menu_antrian;
+    int proyek_hapus_antrian;
+    system("cls");
+    cout << "Tampilan List Antrian Proyek WIP yang Ada" << endl;
+    cout << "=================================" << endl << endl;
+    for(int i = 0; i < proyekwip.penanda_array; i++)
+    {
+        cout << nomorantrian << ". " << proyekwip.listproyek[i] << endl;
+        nomorantrian++;
+    }
+    cout << "Pilih Opsi dibawah ini [1..3]" << endl;
+    cout << "[1]Hapus Proyek [2]Pindahkan ke Finish [3]Kembali : ";
+    cin >> pil_menu_antrian;
+    if(pil_menu_antrian == 1)
+    {
+    	
+	}
+	else if(pil_menu_antrian == 2)
+	{
+		
+	}
+	else if(pil_menu_antrian == 3)
+	{
+		Menu();
+	}
+}
+
 int main()
 {
     data_ada();
 	Login();
 }
+
+//backend udah semua kecuali search, sort, stack(bingung)
