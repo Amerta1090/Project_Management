@@ -2,17 +2,16 @@
 #include <string>
 #include <unistd.h>
 #include <cstdio>
-#include <stack>
 #include <queue>
 #define maxproyek 150
 using namespace std;
 
 struct proyek{
+    queue<string> sekaligus;
 	string listproyek[maxproyek];
 	string statusproyek;	
 	int penanda_array = 0;
 	string listproyeksementara[maxproyek];
-    stack<string> undoStack;
 }proyek;
 struct proyekwip{
 	string listproyek[maxproyek];
@@ -43,6 +42,7 @@ void SearchProyek();
 void SortProyek();
 void UndoTambahProyek();
 void UndoPindahWIP();
+void TambahProyekSekaligus();
 
 void SearchProyekWIP();
 void SortProyekWIP();
@@ -188,7 +188,7 @@ void ListProyek()
         nomor++;
     }
     cout << "Pilih Opsi dibawah ini [1..4]" << endl;
-    cout << "[1]Tambah Proyek\n[2]Hapus Proyek\n[3]Pindahkan ke WIP\n[4]Search Proyek\n[5]Sort Proyek\n[6]Undo Tambah Proyek\n[7]Undo Pindah WIP\n[8]Kembali: ";
+    cout << "[1]Tambah Proyek\n[2]Hapus Proyek\n[3]Pindahkan ke WIP\n[4]Search Proyek\n[5]Sort Proyek\n[6]Undo Tambah Proyek\n[7]Undo Pindah WIP\n[8]Kembali\b[9]sekaligus: ";
     cin >> pil_menu_lp;
     if(pil_menu_lp == 1)
     {
@@ -199,7 +199,6 @@ void ListProyek()
 
         proyek.listproyek[proyek.penanda_array] += proyek_tambah;
         proyek.penanda_array++;
-        proyek.undoStack.push(proyek.listproyek[proyek.penanda_array - 1]); // push proyek terakhir ke stack
         ListProyek();
         
     }
@@ -270,6 +269,10 @@ void ListProyek()
     else if(pil_menu_lp == 8)
     {
     	Menu();
+    }
+    else if(pil_menu_lp == 9)
+    {
+        TambahProyekSekaligus();
     }
 }
 void SearchProyek()
@@ -342,19 +345,59 @@ void UndoPindahWIP()
 {
     if (proyekwip.penanda_array > 0)
     {
-        proyek.listproyek[proyek.penanda_array - 1] = proyek.undoStack.top();
-        proyek.undoStack.pop(); // mengembalikan proyek terakhir dari stack
-        ListProyek();
+        int proyek_terakhir = proyekwip.penanda_array - 1;
+        proyek.listproyek[proyek.penanda_array] = proyekwip.listproyek[proyek_terakhir];
+        proyek.penanda_array++;
+        proyekwip.listproyek[proyek_terakhir] = "";
+        proyekwip.penanda_array--;
 
-        cout << "Proyek berhasil di-undo dan dikembalikan ke List Proyek." << endl;
+        cout << "Proyek berhasil di-undo dan dikembalikan ke List Proyek WIP." << endl;
     }
     else
     {
-        cout << "Tidak ada proyek yang bisa di-undo pada List Proyek WIP." << endl;
+        cout << "Tidak ada proyek yang bisa di-undo pada List Proyek Finish." << endl;
     }
 
     getchar();
     ListProyek();
+}
+void TambahProyekSekaligus() {
+    int jumlah_data;
+    cout << "Berapa banyak data yang ingin dimasukkan sekaligus? : ";
+    cin >> jumlah_data;
+
+    cin.ignore(); // Membersihkan newline character dari buffer
+
+    for (int i = 0; i < jumlah_data; i++) {
+        string nama_proyek;
+        cout << "Masukkan nama proyek ke-" << i + 1 << ": ";
+        getline(cin, nama_proyek);
+        proyek.sekaligus.push(nama_proyek);
+    }
+
+    cout << "Berikut List Sementara" << endl;
+    int nomersementara = 1;
+    queue<string> proyek_sementara = proyek.sekaligus;
+    while (!proyek_sementara.empty()) {
+        cout << nomersementara << ". " << proyek_sementara.front() << endl;
+        proyek_sementara.pop();
+        nomersementara++;
+    }
+
+    string pilihan_yn;
+    cout << "Apakah Yakin ingin menambahkan ke list? (y/n) : ";
+    cin >> pilihan_yn;
+
+    if (pilihan_yn == "y") {
+        while (!proyek.sekaligus.empty()) {
+            proyek.listproyek[proyek.penanda_array] = proyek.sekaligus.front();
+            proyek.sekaligus.pop();
+            proyek.penanda_array++;
+        }
+        ListProyek();
+    } else if (pilihan_yn == "n") {
+        ListProyek();
+    }
 }
 
 
